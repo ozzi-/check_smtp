@@ -97,9 +97,9 @@ if [ $status -eq 0 ] ; then
    echo "WARNING - runtime "$runtime" bigger than warning runtime '"$warning"'"
    exit 1;
  fi;
- echo "OK: smtp send in "$runtime" ms | value=$runtime;$warning;$critical;0;$critical"
+ echo "OK: smtp send in "$runtime" ms | runtime=$runtimems;$warning;$critical;0;$critical"
  exit 0;
 else
- echo "CRITICAL: smtp send failed with return code '"$status"' in "$runtime" ms with message '"$body"' | value=$runtime;$warning;$critical;0;$critical"
+ echo "CRITICAL: smtp send failed with return code '"$status"' in "$runtime" ms with message '"$body"' | runtime=$runtimems;$warning;$critical;0;$critical"
  exit 2;
 fi;
