@@ -41,7 +41,7 @@ Usage: check_smtp [OPTIONS]
   -M MESSAGE        Message to be sent (default: check_smtp message)
   -S SUBJECT        Subject to be send (default: check_smtp subject)
   -A ACCOUNT        Account to be used (default: default used in config file)
-  -R RECIPIENT      Recipient E-Mail Address
+  -R RECIPIENT      Recipient E-Mail Address (use it multiple times for more recipients)
   Note: msmtp requires a config file under /etc/msmtprc
 ```
 
@@ -55,6 +55,11 @@ Example setting custom message and a lower warning threshold:
 ./check_smtp.sh -R recipient@local.ch -M "Custom!" -w 1500
 ```
 
+Example sending to multiple recipients:
+```
+./check_smtp.sh -R recipient@local.ch -R another@local.ch
+```
+
 ## Command Template
 ```
 object CheckCommand "check-smtp" {
@@ -65,7 +70,10 @@ object CheckCommand "check-smtp" {
     "-M" = "Icinga Test"
     "-S" = "Icinga Test"
     "-A" = "test"
-    "-R" = "test@local.ch"
+    "-R" = {
+           value = "$recipient$"
+           repeat_key = true
+    }
   }
 }
 ```

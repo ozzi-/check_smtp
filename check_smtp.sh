@@ -34,13 +34,14 @@ usage() {
   -M MESSAGE        Message to be sent (default: check_smtp message)
   -S SUBJECT        Subject to be send (default: check_smtp subject)
   -A ACCOUNT        Account to be used (default: default used in config file)
-  -R RECIPIENT      Recipient E-Mail Address
+  -R RECIPIENT      Recipient E-Mail Address (use it multiple times for more recipients)
   Note: msmtp requires a config file under /etc/msmtprc
   '''
 }
 
 #main
 #get options
+recipients=()
 while getopts "c:w:M:S:A:R:" opt; do
   case $opt in
     c)
@@ -59,7 +60,7 @@ while getopts "c:w:M:S:A:R:" opt; do
       account=$OPTARG
       ;;
     R)
-      recipient=$OPTARG
+      recipients+=("$OPTARG")
       ;;
     *)
       usage
@@ -69,19 +70,20 @@ while getopts "c:w:M:S:A:R:" opt; do
 done
 
 #Required params
-if [ -z "$recipient" ] || [ $# -eq 0 ]; then
+if [ -z "${recipients[*]}" ] || [ $# -eq 0 ]; then
   echo "Error: recipient is required"
   usage
   exit 3
 fi
 
-
 start=$(echo $(($(date +%s%N)/1000000)))
-if [ -z "$account" ]; then
-  body=$(echo -e "To: $recipient\nSubject:$subject\n\n$message" | $msmtp $recipient  2>&1)
-else
-  body=$(echo -e "To: $recipient\nSubject:$subject\n\n$message" | $msmtp -a $account $recipient  2>&1)
-fi
+for recipient in "${recipients[@]}"; do
+  if [ -z "$account" ]; then
+    body=$(echo -e "To: $recipient\nSubject:$subject\n\n$message" | $msmtp $recipient  2>&1)
+  else
+    body=$(echo -e "To: $recipient\nSubject:$subject\n\n$message" | $msmtp -a $account $recipient 2>&1)
+  fi
+done
 status=$?
 end=$(echo $(($(date +%s%N)/1000000)))
 runtime=$(($end-$start))
